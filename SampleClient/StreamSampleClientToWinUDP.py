@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-ImgStreamClient.py
+IStreamSampleClientToWinUDP.py
 Created on Mon Oct 25 23:58:53 2021
-http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_video/py_bg_subtraction/py_bg_subtraction.html
-https://www.letitride.jp/entry/2020/07/18/234941
 """
 import cv2
 import socket
@@ -15,7 +13,7 @@ import ImgRecFunction
 HOST = 'localhost'
 PORT = 50000
 DATASIZE = 32678
-ADMISSIONCODE = "333acv2dfert"
+STARTCODE = "START"
 ENDCODE = "QUITE"
 
 if __name__ == '__main__':
@@ -25,8 +23,8 @@ if __name__ == '__main__':
     hog = cv2.HOGDescriptor()
     hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
     hogParams = {
-    "winStride":(8,8),  # 多分、rectのmargin？
-    "padding":(0,0), # 画像の解析範囲 pddingを取ると狭くなる？
+    "winStride":(8,8),
+    "padding":(0,0),
     "scale":1.05,
     "hitThreshold":0,
     "finalThreshold":1
@@ -37,7 +35,7 @@ if __name__ == '__main__':
     print(client.gettimeout())
     
     #Send Addmission Code.
-    client.sendto(ADMISSIONCODE.encode('utf-8'),(HOST,PORT)) 
+    client.sendto(STARTCODE.encode('utf-8'),(HOST,PORT)) 
     #data = client.recv(64).decode('utf-8')  
     #GetFramInfo From Service.
     if False == rec.GetFrameInf(client):
