@@ -1,6 +1,6 @@
 # MultiStream2
 # Provides real-time views to multiple clients. 
-## emviloment
+## environment 
 Server(Camera)
 - Windows 10.
 - C++ Application.
@@ -8,3 +8,5 @@ Server(Camera)
 Client(Accept Image Data)
 - Windows 10.
 - Python 3.8
+- 
+## How to use  
