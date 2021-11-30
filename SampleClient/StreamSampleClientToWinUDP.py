@@ -11,8 +11,8 @@ import datetime
 import ImgRecFunction
 
 HOST = 'localhost'
-PORT = 50000
-DATASIZE = 32678
+PORT = 5000
+DATASIZE = 65300
 STARTCODE = "START"
 ENDCODE = "QUITE"
 

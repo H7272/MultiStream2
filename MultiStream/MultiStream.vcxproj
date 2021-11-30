@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClientBuffer.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="ImageStream.cpp" />
     <ClCompile Include="MultiStream.cpp" />
@@ -159,6 +160,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClientBuffer.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="ImageStream.h" />
   </ItemGroup>

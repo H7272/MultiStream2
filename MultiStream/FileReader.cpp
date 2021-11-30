@@ -15,16 +15,15 @@ FileReader::FileReader(std::string filename)
  */
 bool  FileReader::GetLineToValueString(std::string LineString, std::string& ValueString)
 {
-    // •¶š—ñ‚ª0‚Å‚È‚¢‚È‚çInt‚É•ÏŠ·.
     if (0 == LineString.size()) {
         return false;
     }
-    // "=" ‚ÌˆÊ’u‚ğæ“¾.
+    // Get"="Pos.
     const size_t startpos = LineString.find("=");
     if (std::string::npos == startpos) {
         return false;
     }
-    // ";" ‚ÌˆÊ’u‚ğæ“¾.
+    // Get";"Pos.
     const size_t endpos = LineString.find(";");
     if (std::string::npos == endpos) {
         return false;
@@ -32,9 +31,8 @@ bool  FileReader::GetLineToValueString(std::string LineString, std::string& Valu
     if (startpos > endpos) {
         return false;
     }
-    // "="‚©‚ç";"‚Ì•¶š—ñ‚ğ’Šo.
+    // Get String from "=" to ";"
     std::string strNumber = LineString.substr(startpos + (size_t)1, endpos - (startpos + (size_t)1));
-    // •¶š—ñ‚ª0‚Å‚È‚¢‚È‚çInt‚É•ÏŠ·.
     if (0 == strNumber.size()) {
         return false;
     }
@@ -53,7 +51,7 @@ bool  FileReader::GetLineToValueString(std::string LineString, std::string& Valu
  void FileReader::GetFileElement(ReadWord& ReadInfo)
  {
      std::ifstream file(MyFileName);
-     const int buf_size = 60;
+     const int buf_size = 255;
      char readdata[buf_size];
       
      if (!file.fail()) {

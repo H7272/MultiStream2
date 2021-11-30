@@ -14,7 +14,7 @@ void* ImageStream::VideoStream(void* arg)
     }
     // SetData.
     struct TransfarDoc* TransfarDoc = (struct TransfarDoc*)arg;
-    std::vector<sockaddr_in*>* pClientBuffer = TransfarDoc->pClientBuffer;
+    ClientBuffer* pClientBuffer = TransfarDoc->pClientBuffer;
     SOCKET* pListenSocket = TransfarDoc->pListenSocket;
     const int DataBufferSize = TransfarDoc->DataBufferSize;
     const int CameraPort = TransfarDoc->CameraPort;
@@ -25,7 +25,7 @@ void* ImageStream::VideoStream(void* arg)
     while (1) {
 
         // If Client 0 Then Wait Continue.
-        if (0 == pClientBuffer->size()) {
+        if (0 == pClientBuffer->IsSize()) {
             Sleep(1);
             continue;
         }
@@ -52,7 +52,7 @@ void* ImageStream::VideoStream(void* arg)
         sendbuf = new char[DataBufferSize]();
 
         // StratStreaming.
-        while (0 != pClientBuffer->size()) {
+        while (0 != pClientBuffer->IsSize()) {
             memset(sendbuf, 0, DataBufferSize);
             // Captre Image.
             captre >> frame;
@@ -60,25 +60,16 @@ void* ImageStream::VideoStream(void* arg)
             // Image to SendBuffer.
             int pos = 0;
             for (unsigned char i : ibuff) { sendbuf[pos++] = i; }
-            // Send ImageData to All Client.
-            pthread_mutex_lock(&count_mutex);
-            std::vector<sockaddr_in*>::iterator itrClient = pClientBuffer->begin();
-            while (itrClient != pClientBuffer->end()) {
-                sendto(*pListenSocket, sendbuf, DataBufferSize, 0, (SOCKADDR*)*itrClient, sizeof(**itrClient));
-                Sleep(1);
-                ++itrClient;
-            }
-            pthread_mutex_unlock(&count_mutex);
+            //Send Imag Buffer.
+            pClientBuffer->SendImage(pListenSocket, sendbuf, DataBufferSize);
         }
 
         // Disconnect Process.
         printf("StreamTH:CloseCaptre \n");
         ibuff.shrink_to_fit();
         captre.release();
-        for (sockaddr_in* pClient : *pClientBuffer) {
-            delete pClient;
-        }
-        printf("StreamTH:Wait Next Connect...%d :\n", (int)pClientBuffer->size());
+        pClientBuffer->DeleteAllClient();
+        printf("StreamTH:Wait Next Connect...%d :\n", (int)pClientBuffer->IsSize());
     }
     return 0;
 }

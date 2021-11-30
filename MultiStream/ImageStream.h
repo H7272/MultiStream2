@@ -10,8 +10,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <pthread.h>
 
+#include "ClientBuffer.h"
+
 struct TransfarDoc {
-    std::vector<sockaddr_in*>* pClientBuffer;
+    //std::vector<sockaddr_in*>* pClientBuffer;
+    ClientBuffer* pClientBuffer;
     SOCKET* pListenSocket;
     int    DataBufferSize;
     int    CameraPort;
@@ -20,7 +23,6 @@ struct TransfarDoc {
     double CameraFPS;
 };
 
-static pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
 /**
  * @ImageStream
  *

@@ -10,25 +10,26 @@ import numpy as np
 import ImgRecFunction
 
 HOST = 'localhost'
-PORT = 50000
-DATASIZE = 32678
+PORT = 5000
+DATASIZE = 65300
 STARTCODE = "START"
 ENDCODE = "QUITE"
 
 if __name__ == '__main__':
    
-    
-    rec = ImgRecFunction.RecFunction()
+    #CreateSocket
     client = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-    print(client.gettimeout())
-    
+
     #Send Start Code.
     client.sendto(STARTCODE.encode('utf-8'),(HOST,PORT)) 
     
     #GetFramInfo From Service.
-    if False == rec.GetFrameInf(client):
+    try:
+        FrameInfo = client.recv(32).decode('shift_jis')
+    except:
         client.close()
         sys.exit()
+  
     client.settimeout(20)    
     count = 0
     while True:
@@ -38,15 +39,11 @@ if __name__ == '__main__':
             img_array = np.frombuffer(RecvImg, dtype=np.uint8)
             frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)         
             if frame is not None:
-               rec.Imshow(frame) 
+               cv2.imshow('frame',frame)
                
-            #ColseInput'q'On Frame, Input'r' On Frme Stat or Stop Rec.
+            #ColseInput'q'On Frame.
             key = cv2.waitKey(1)
-            #Rec.
-            if key & 0xFF == ord('r'):
-                if False == rec.ChangeState():
-                    break
-                continue
+   
             #Close.   
             if key & 0xFF == ord('q'):
                 #Send Quite.
@@ -60,6 +57,5 @@ if __name__ == '__main__':
         except:
                break
            
-    rec.Close()
     cv2.destroyAllWindows()
     client.close()

@@ -1,5 +1,4 @@
-﻿// TestSimpleThread.cpp : このファイルには 'main' 関数が含まれています。プログラム実行の開始と終了がそこで行われます。
-
+﻿
 #define HAVE_STRUCT_TIMESPEC // [Add] 
 
 #include <string>
@@ -32,71 +31,6 @@
 #define CHECKSTEP 10
 
 /**
- * @SarchDisconnectClient .
- * @brief: Erase Specific Client from Buffer.
- */
-bool SarchDisconnectClient(sockaddr_in* pClientSocket, std::vector<sockaddr_in*>* pClientSocketBuffer) {
-
-    char ErrorClientIP[INET6_ADDRSTRLEN] = {};
-    inet_ntop(pClientSocket->sin_family, &(pClientSocket->sin_addr), ErrorClientIP, sizeof(ErrorClientIP));
-    printf(" Sarch DisconnectClient In Buffer %s\n", ErrorClientIP);
-
-    std::vector<sockaddr_in*>::iterator itrClient = pClientSocketBuffer->begin();
-    while (itrClient != pClientSocketBuffer->end()) {
-        char BufferIP[INET6_ADDRSTRLEN] = {};
-        sockaddr_in* pInBufferClientSocket = *itrClient;
-        inet_ntop(pInBufferClientSocket->sin_family, &(pInBufferClientSocket->sin_addr), BufferIP, sizeof(BufferIP));
-
-        if (strcmp(ErrorClientIP, BufferIP) == 0) {
-            itrClient = pClientSocketBuffer->erase(itrClient);
-            printf(" Erase Client From Buffer %s\n", ErrorClientIP);
-            printf(" Client Num %d :\n", (int)pClientSocketBuffer->size());
-            delete pInBufferClientSocket;
-            break;
-        }
-        ++itrClient;
-    }
-    return true;
-}
-
-/**
- * @SarchConnectedClient .
- * @brief:Return true If Specific Client in Buffer.
- */
-bool SarchConnectedClient(sockaddr_in* pClientSocket, std::vector<sockaddr_in*>* pClientSocketBuffer) {
-
-    char ErrorClientIP[INET6_ADDRSTRLEN] = {};
-    inet_ntop(pClientSocket->sin_family, &(pClientSocket->sin_addr), ErrorClientIP, sizeof(ErrorClientIP));
-
-    std::vector<sockaddr_in*>::iterator itrClient = pClientSocketBuffer->begin();
-    while (itrClient != pClientSocketBuffer->end()) {
-        char BufferIP[INET6_ADDRSTRLEN] = {};
-        sockaddr_in* pInBufferClientSocket = *itrClient;
-        inet_ntop(pInBufferClientSocket->sin_family, &(pInBufferClientSocket->sin_addr), BufferIP, sizeof(BufferIP));
-
-        if (strcmp(ErrorClientIP, BufferIP) == 0) {
-            return true;
-        }
-        ++itrClient;
-    }
-    return false;
-}
-
-/**
- * @DeleteAllClient.
- * @brief: All Client Erase.
- */
-void DeleteAllClient(std::vector<sockaddr_in*>* pClientSocketBuffer) {
-    std::vector<sockaddr_in*>::iterator itrClient = pClientSocketBuffer->begin();
-    while (itrClient != pClientSocketBuffer->end()) {
-        sockaddr_in* pInBufferClientSocket = *itrClient;
-        itrClient = pClientSocketBuffer->erase(itrClient);
-        delete pInBufferClientSocket;
-    }
-    return;
-}
-
-/**
  * @MultiCameraStream(Main)
  *
  * @brief:RealTimeImageStreaming to multiple clients. 
@@ -106,25 +40,26 @@ int main(int argc, char* argv[])
 {
     // Read Ini File.
     ReadWord readword;
-    readword.TimeOut = CHECKSTEP;
+    readword.TimeOut        = CHECKSTEP;
     readword.DataBufferSize = DEFAULT_BUFLEN;
-    readword.CameraPort  = CAMERAPORT;
-    readword.CameraWidth = CAMERAWIDTH;
-    readword.CameraHight = CAMERAHIGHT;
-    readword.CameraFPS   = CAMERAFPS;
-    readword.UsePort     = DEFAULT_PORT;
+    readword.CameraPort     = CAMERAPORT;
+    readword.CameraWidth    = CAMERAWIDTH;
+    readword.CameraHight    = CAMERAHIGHT;
+    readword.CameraFPS      = CAMERAFPS;
+    readword.UsePort        = DEFAULT_PORT;
 
     FileReader fileread("Setting.ini");
     fileread.GetFileElement(readword);
-    int    TimeOut = readword.TimeOut;
+    
+    const int  TimeOut = readword.TimeOut;
+    const unsigned short Port = readword.UsePort;
 
     // Winsock Setting. 
     WSADATA wsaData;
     SOCKET ListenSocket = INVALID_SOCKET;
     struct sockaddr_in ListenAddr;
 
-    const unsigned short Port = readword.UsePort;
-
+   
     // Initialize Winsock
     if (0 != WSAStartup(MAKEWORD(2, 2), &wsaData)) {
         return 1;
@@ -150,11 +85,10 @@ int main(int argc, char* argv[])
 
     u_long val = 1;
     ioctlsocket(ListenSocket, FIONBIO, &val);
-
+   
+    ClientBuffer ClientBuffer;
     struct TransfarDoc TransfarDoc;
-    std::vector<sockaddr_in*> pClientSocketBuffer;
-    pthread_t handle;
-    TransfarDoc.pClientBuffer = &pClientSocketBuffer;
+    TransfarDoc.pClientBuffer = &ClientBuffer;
     TransfarDoc.pListenSocket = &ListenSocket;
     TransfarDoc.CameraPort  = readword.CameraPort;
     TransfarDoc.CameraWidth = readword.CameraWidth;
@@ -162,6 +96,9 @@ int main(int argc, char* argv[])
     TransfarDoc.CameraFPS   = readword.CameraFPS;
     TransfarDoc.DataBufferSize = readword.DataBufferSize;
     ImageStream ImageStream;
+    
+    // CreateVideoThread.
+    pthread_t handle;
     pthread_create(&handle, NULL, ImageStream.VideoStream, &TransfarDoc);
 
     char RecvMessage[1024] = {};
@@ -188,17 +125,15 @@ int main(int argc, char* argv[])
             recvfrom(ListenSocket, RecvMessage, sizeof(RecvMessage), 0, (SOCKADDR*)pClientSocket, &ClientSocketSize);
             ErroCode = WSAGetLastError();
             if (WSAEWOULDBLOCK == ErroCode) {
-                // ReWait.
+                // Re Wait....
                 Sleep(10);
-                // クライアントがいるはずなのにLastAckTimeを確認最終結果から1sec経過していたら全クライアントを削除.
-                if (pClientSocketBuffer.size() > 0) {
+                // Check Time Out.
+                if (ClientBuffer.IsSize() > 0) {
                     time_t NowAckTime = time(NULL);
                     __int64 TimeDiff = NowAckTime - LastAckTime;
                     if (TimeDiff > TimeOut) {
                         printf("Main;All Client Bye...: %lld , %lld \n", (__int64)NowAckTime, (__int64)LastAckTime);
-                        pthread_mutex_lock(&count_mutex);
-                        DeleteAllClient(&pClientSocketBuffer);
-                        pthread_mutex_unlock(&count_mutex);
+                        ClientBuffer.DeleteAllClient();
                     }
                 }
                 continue;
@@ -215,7 +150,7 @@ int main(int argc, char* argv[])
             if (WSAECONNRESET == ErroCode) {
                 pthread_mutex_lock(&count_mutex);
                 if (AF_INET == pClientSocket->sin_family) {
-                    SarchDisconnectClient(pClientSocket, &pClientSocketBuffer);
+                    ClientBuffer.SarchDisconnectClient(pClientSocket);
                 }
                 else {
                     printf("Main;Connect Unknown Client Request\n");
@@ -236,35 +171,29 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        // クライアント終了通知.
+        // Close Client.
         if (0 == strcmp(RecvMessage, ENDCODE)) {
             printf("Main;Quit Client %s\n", ClientIP);
-            // 終了通知受信元を削除.
-            pthread_mutex_lock(&count_mutex);
-            if (0 != pClientSocketBuffer.size()) {
-                // ベクトル内の同じクライアントを検索して削除する.
-                SarchDisconnectClient(pClientSocket, &pClientSocketBuffer);
+            if (0 != ClientBuffer.IsSize()) {
+                ClientBuffer.SarchDisconnectClient(pClientSocket);
             }
-            pthread_mutex_unlock(&count_mutex);
             delete pClientSocket;
             continue;
         }
 
-        // 承認確認.
+        // Enter Client.
         if (0 == strcmp(RecvMessage, STARTCODE)) {
             printf("Main;Permission Connection from %s \n", ClientIP);
-            // カメラのデータをクライアントに渡す.
+            // Send CameraPropaty.
             sendto(ListenSocket, Sendemssage, sizeof(Sendemssage), 0, (struct sockaddr*)pClientSocket, ClientSocketSize);
             // 接続先の sockaddr_in オブジェクトを登録する.
-            pthread_mutex_lock(&count_mutex);
-            pClientSocketBuffer.push_back((pClientSocket));
-            pthread_mutex_unlock(&count_mutex);
+            ClientBuffer.PushBuck((pClientSocket));
             LastAckTime = time(NULL);
             continue;
         }
 
-        // 通信あり.
-        if (true == SarchConnectedClient(pClientSocket, &pClientSocketBuffer)) {
+        // Recive Signal.
+        if (true == ClientBuffer.SarchConnectedClient(pClientSocket)) {
             LastAckTime = time(NULL);
             continue;
         }
