@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
     time_t LastAckTime = 0;
 
     // Image Property Message. 
-    std::snprintf(Sendemssage, sizeof(Sendemssage), "%d,%d,%d,", CAMERAWIDTH, CAMERAHIGHT, CAMERAFPS);
+    std::snprintf(Sendemssage, sizeof(Sendemssage), "%d,%d,%d,", (int)readword.CameraWidth, (int)readword.CameraHight, CAMERAFPS);
 
     // Start Process.
     printf("Main;Waiting ... Stop Ctr + Brk :\n");

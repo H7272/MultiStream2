@@ -7,7 +7,7 @@ import cv2
 import socket
 import sys
 import numpy as np
-import ImgRecFunction
+
 
 HOST = 'localhost'
 PORT = 5000
