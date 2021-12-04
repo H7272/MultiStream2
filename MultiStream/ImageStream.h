@@ -16,6 +16,7 @@ struct TransfarDoc {
     //std::vector<sockaddr_in*>* pClientBuffer;
     ClientBuffer* pClientBuffer;
     SOCKET* pListenSocket;
+    int    JPGQuality;
     int    DataBufferSize;
     int    CameraPort;
     double CameraWidth;

@@ -76,6 +76,15 @@ bool  FileReader::GetLineToValueString(std::string LineString, std::string& Valu
                  continue;
              }
 
+             if (std::string::npos != str1.find("JPGQuality")) {
+                 if (false == GetLineToValueString(str1, ValueString)) {
+                     continue;
+                 }
+                 ReadInfo.JPGQuality = std::stoi(ValueString);
+                 std::cout << "Set Ini Value JPGQuality:" << ReadInfo.JPGQuality << std::endl;
+                 continue;
+             }
+
              if (std::string::npos != str1.find("DataBufferSize")) {
                  if (false == GetLineToValueString(str1, ValueString)) {
                      continue;

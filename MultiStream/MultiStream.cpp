@@ -94,6 +94,7 @@ int main(int argc, char* argv[])
     TransfarDoc.CameraWidth = readword.CameraWidth;
     TransfarDoc.CameraHight = readword.CameraHight;
     TransfarDoc.CameraFPS   = readword.CameraFPS;
+    TransfarDoc.JPGQuality  = readword.JPGQuality;
     TransfarDoc.DataBufferSize = readword.DataBufferSize;
     ImageStream ImageStream;
     

@@ -3,6 +3,7 @@
 typedef struct ReadWord {
     unsigned short  UsePort;
     int    TimeOut;
+    int    JPGQuality;
     int    DataBufferSize;
     int    CameraPort;
     double CameraWidth;
