@@ -22,5 +22,16 @@ Client(Accept Image Data)
 2. Execute MultiStream.exe on the PC to which the USB camera is connected.
 3. Execute Python code (**SimpleWinUDP.py**) on the client PC.
 
+## Server Client Protocol
+1. Client **Send**  "START" Message to Server.
+2. Client **Receive**  "ImageSize", "FPS" from Server.
+3. Client **Receive** Image from server.
+4. client **Send** "Alive" within TimeOut(Setting.ini).
+5. client **send**  "Alive" within the timeout period after sending the start.\
+In addition, after sending "Alive", Client need to **send** "Alive" again within the timeout period. 
+
+## Image size
+The size of the image that can be sent by the server is up to **65500** bytes after JPEG encoding. 
+
 ### Cautions
 The author does not guarantee the operation of the target software and does not take any responsibility for the result that occurs.
