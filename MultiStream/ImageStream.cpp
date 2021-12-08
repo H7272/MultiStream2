@@ -60,6 +60,12 @@ void* ImageStream::VideoStream(void* arg)
             // Captre Image.
             captre >> frame;
             imencode(".jpg", frame, ibuff, param);
+            // Check ibuff Size.
+            if (ibuff.size() >= DataBufferSize) {
+                printf("StreamTH: Image Size Over!!! %d \n", (int)ibuff.size());
+                break;
+            }
+            
             // Image to SendBuffer.
             int pos = 0;
             for (unsigned char i : ibuff) { sendbuf[pos++] = i; }
