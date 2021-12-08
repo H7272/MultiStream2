@@ -15,13 +15,13 @@ void* ImageStream::VideoStream(void* arg)
     // SetData.
     struct TransfarDoc* TransfarDoc = (struct TransfarDoc*)arg;
     ClientBuffer* pClientBuffer = TransfarDoc->pClientBuffer;
-    SOCKET* pListenSocket  = TransfarDoc->pListenSocket;
+    SOCKET* pListenSocket       = TransfarDoc->pListenSocket;
           int    JPGQuality     = TransfarDoc->JPGQuality;
     const int    DataBufferSize = TransfarDoc->DataBufferSize;
     const int    CameraPort     = TransfarDoc->CameraPort;
-    const double CameraWidth = TransfarDoc->CameraHight;
-    const double CameraHight = TransfarDoc->CameraWidth;
-    const double CameraFPS   = TransfarDoc->CameraFPS;
+    const double CameraWidth    = TransfarDoc->CameraWidth;
+    const double CameraHight    = TransfarDoc->CameraHight;
+    const double CameraFPS      = TransfarDoc->CameraFPS;
   
     while (1) {
 
