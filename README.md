@@ -24,6 +24,9 @@ Client(Accept Image Data)
 2. Execute MultiStream.exe on the PC to which the USB camera is connected.
 3. Execute Python code (**SimpleWinUDP.py**) on the client PC.
 
+You might be need copy "opencv_world420.dll","opencv_world420d.dll" in **Release** Folder.\
+[Get Opencv Dll !!](https://opencv.org/opencv-4-2-0/)
+
 ## Server Client Protocol
 1. Client **Send**  "START" Message to Server.
 2. Client **Receive**  "ImageSize", "FPS" from Server.
