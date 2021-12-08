@@ -8,13 +8,15 @@ You can send the image from the USB camera onto your python code and immediately
 
 ## Feature
  Multiple Client can connect a one Camera Server So Share The Same Image.
-## Environment 
+## Environment
 Server(Camera)
 - Windows 10.
+- opencv 4.2.0
 - C++ Application(MultiStream.exe).
 
 Client(Accept Image Data)
 - Python 3.8
+- opencv 4.2.0
 - MultiStream2/SampleClient/SimpleWinUDP.py
 
 ## How to use
@@ -28,10 +30,10 @@ Client(Accept Image Data)
 3. Client **Receive** Image from server.
 4. client **Send** "Alive" within TimeOut(Setting.ini).
 5. client **send**  "Alive" within the timeout period after sending the start.\
-In addition, after sending "Alive", Client need to **send** "Alive" again within the timeout period. 
+In addition, after sending "Alive", Client need to **send** "Alive" again within the timeout period.
 
 ## Image size
-The size of the image that can be sent by the server is up to **65500** bytes after JPEG encoding. 
+The size of the image that can be sent by the server is up to **65500** bytes after JPEG encoding.
 
 ### Cautions
 The author does not guarantee the operation of the target software and does not take any responsibility for the result that occurs.
